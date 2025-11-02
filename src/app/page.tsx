@@ -132,15 +132,22 @@ Ask me anything about their background, experience, or what specific skills they
         
         const result = await response.json();
         console.log("Embeddings built successfully:", result);
-        setEmbeddingsReady(true);
-
-        // Generate introduction message after embeddings are ready
-        setTimeout(() => generateIntroMessage(extractedName), 1000);
+        
+        if (result.success) {
+          setEmbeddingsReady(true);
+          // Generate introduction message after embeddings are ready
+          setTimeout(() => generateIntroMessage(extractedName), 1000);
+        } else {
+          throw new Error(result.error || "Failed to build embeddings");
+        }
       } catch (error) {
         console.error("Failed to build embeddings:", error);
-        alert(`Error: ${error instanceof Error ? error.message : "Failed to build embeddings"}`);
+        const errorMsg = error instanceof Error ? error.message : "Failed to build embeddings";
+        alert(`Error: ${errorMsg}\n\nPlease check:\n1. API key is set in Vercel\n2. Files are not too large\n3. Network connection is stable`);
+        setEmbeddingsReady(false);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
   }
 
@@ -208,8 +215,11 @@ Ask me anything about their background, experience, or what specific skills they
   async function ask(e: React.FormEvent) {
     e.preventDefault();
     if (!q.trim()) return;
-    if (!embeddingsReady && uploadedFiles.length > 0) {
-      alert("Please wait for embeddings to be built first.");
+    
+    // Allow asking even if embeddings aren't ready - will use general knowledge
+    // But warn if embeddings are still being built
+    if (loading && uploadedFiles.length > 0) {
+      alert("Please wait for embeddings to finish building before asking questions.");
       return;
     }
 
@@ -222,10 +232,15 @@ Ask me anything about their background, experience, or what specific skills they
     setQ("");
     setLoading(true);
 
+    // Include files in request for serverless environments where embeddings don't persist
+    // This allows the API to rebuild embeddings on-the-fly if needed
     const res = await fetch("/api/ask", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question: userMsg.text }),
+      body: JSON.stringify({ 
+        question: userMsg.text,
+        files: uploadedFiles.length > 0 ? uploadedFiles : undefined, // Include files if available
+      }),
     });
 
     if (!res.ok) {

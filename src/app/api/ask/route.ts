@@ -2,15 +2,18 @@
 // /app/api/ask/route.ts
 import { NextRequest } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { loadEmbeddingIndex } from "../../../../lib/embeddings";
+import { loadEmbeddingIndex, buildEmbeddingIndexFromFiles } from "../../../../lib/embeddings";
 import { topK } from "../../../../lib/retrieve";
 import { systemPrompt, userPrompt } from "../../../../lib/prompt";
+import type { UploadedFile } from "../../../../lib/types";
 
-export const runtime = "nodejs"; // or "edge" if you prefer
+export const runtime = "nodejs";
+export const maxDuration = 60; // Increase timeout for Vercel
 
 export async function POST(req: NextRequest) {
   try {
-    const { question } = await req.json();
+    const { question, files }: { question?: string; files?: UploadedFile[] } = await req.json();
+    
     if (!question || typeof question !== "string") {
       return new Response("Invalid question", { status: 400 });
     }
@@ -43,7 +46,7 @@ export async function POST(req: NextRequest) {
     // Use gemini-2.5-flash which is the current stable model
     const chatModel = process.env.GEMINI_CHAT_MODEL || "gemini-2.5-flash";
 
-    // 1) Try to load embeddings, handle case when none available
+    // 1) Try to load or build embeddings
     let hits: Array<{
       id: string;
       source: string;
@@ -53,8 +56,31 @@ export async function POST(req: NextRequest) {
     let hasEmbeddings = false;
 
     try {
-      const index = loadEmbeddingIndex();
-      console.log(`Loaded embedding index with ${index.length} chunks`);
+      let index;
+      
+      // First try to load existing embeddings
+      try {
+        index = loadEmbeddingIndex();
+        console.log(`Loaded embedding index with ${index.length} chunks`);
+      } catch (loadError) {
+        // If no embeddings found and files are provided, build them on-the-fly
+        // This is important for serverless environments where embeddings don't persist
+        if (files && files.length > 0) {
+          console.log("No embeddings found, building from provided files...");
+          try {
+            index = await buildEmbeddingIndexFromFiles(files);
+            console.log(`Built embedding index with ${index.length} chunks`);
+          } catch (buildError) {
+            const buildErrorMsg = buildError instanceof Error ? buildError.message : String(buildError);
+            console.error("Failed to build embeddings from files:", buildErrorMsg);
+            // Continue without embeddings
+            throw loadError; // Use original error to proceed without context
+          }
+        } else {
+          // No files provided and no embeddings available
+          throw loadError;
+        }
+      }
 
       // 2) embed query if we have embeddings
       // Use REST API for embeddings
@@ -97,7 +123,7 @@ export async function POST(req: NextRequest) {
       
       // Check if it's a "no embeddings" error vs a real error
       if (errorMsg.includes("No embeddings available")) {
-        console.log("No embeddings file found. User needs to upload files first.");
+        console.log("No embeddings available. Answering with general knowledge.");
       }
       
       hasEmbeddings = false;
