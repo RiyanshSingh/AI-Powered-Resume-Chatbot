@@ -218,81 +218,32 @@ export async function buildEmbeddingIndexFromFiles(
     embedding: vectors[i],
   }));
 
-  // Store in memory AND save to file (for persistence across API routes)
-  (global as unknown as { embeddingIndex?: Chunk[] }).embeddingIndex = indexed;
-  
-  // Save to temporary file - use /tmp in serverless environments (Vercel)
-  // In serverless, /tmp is writable but files don't persist across invocations
-  // So we also rely on global memory which works within the same function instance
-  try {
-    const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
-    const tempDir = isServerless ? "/tmp" : process.cwd();
-    const tempEmbeddingsPath = path.join(tempDir, "embeddings-temp.json");
-    
-    // Ensure /tmp directory exists
-    if (isServerless && !fs.existsSync("/tmp")) {
-      fs.mkdirSync("/tmp", { recursive: true });
-    }
-    
-    fs.writeFileSync(tempEmbeddingsPath, JSON.stringify(indexed, null, 2));
-    console.log(`Saved ${indexed.length} embeddings to ${tempEmbeddingsPath} (serverless: ${isServerless})`);
-  } catch (fileError) {
-    // File write failed, but embeddings are still in memory
-    console.warn("Failed to write embeddings file, using in-memory storage only:", fileError);
-  }
+  // DO NOT store in global memory or shared files - this causes cross-user contamination
+  // Each request should work with its own embeddings only
+  // Return embeddings directly - they'll be used immediately in the same request
+  console.log(`Built ${indexed.length} embeddings from uploaded files (request-scoped, not persisted)`);
 
   return indexed;
 }
 
 export function loadEmbeddingIndex(): Chunk[] {
-  // In serverless (Vercel), files don't persist between invocations
-  // So we rely on global memory which works within the same function instance
-  // Note: This won't work across different API route calls in serverless
+  // Only load pre-built embeddings from data/ directory (embeddings.json)
+  // DO NOT load user-uploaded file embeddings from global state or temp files
+  // This prevents cross-user contamination - each user's files are handled per-request
   
-  // First try to load from global memory (for uploaded files)
-  const globalStore = global as unknown as { embeddingIndex?: Chunk[] };
-  if (globalStore.embeddingIndex && globalStore.embeddingIndex.length > 0) {
-    console.log(`Loaded ${globalStore.embeddingIndex.length} embeddings from global memory`);
-    return globalStore.embeddingIndex;
-  }
-
-  // Try to load from temporary file (uploaded files)
-  // Check both /tmp (serverless) and process.cwd() (local)
-  const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
-  const tempDirs = isServerless ? ["/tmp", process.cwd()] : [process.cwd(), "/tmp"];
-  
-  for (const tempDir of tempDirs) {
-    const tempEmbeddingsPath = path.join(tempDir, "embeddings-temp.json");
-    if (fs.existsSync(tempEmbeddingsPath)) {
-      try {
-        const tempData = JSON.parse(fs.readFileSync(tempEmbeddingsPath, "utf8"));
-        // Also store in global memory for faster access
-        globalStore.embeddingIndex = tempData;
-        console.log(`Loaded ${tempData.length} embeddings from ${tempEmbeddingsPath}`);
-        return tempData;
-      } catch (error) {
-        console.warn(`Error loading temporary embeddings from ${tempEmbeddingsPath}:`, error);
-      }
-    }
-  }
-
-  // Fallback to file-based embeddings (from data directory)
   const p = path.join(process.cwd(), "embeddings.json");
   if (fs.existsSync(p)) {
     try {
       const data = JSON.parse(fs.readFileSync(p, "utf8"));
+      console.log(`Loaded ${data.length} pre-built embeddings from embeddings.json`);
       return data;
     } catch (error) {
       console.warn("Error loading embeddings.json:", error);
     }
   }
   
-  // In serverless, if no embeddings found, provide helpful error
-  const errorMsg = isServerless
-    ? "No embeddings available. Note: In serverless environments, embeddings from uploaded files may not persist. Please upload files again or use pre-built embeddings."
-    : "No embeddings available. Upload files or run buildEmbeddingIndex() first.";
-  
-  throw new Error(errorMsg);
+  // No pre-built embeddings found - user must upload files
+  throw new Error("No embeddings available. Upload files to analyze.");
 }
 
 function cryptoRandomId() {

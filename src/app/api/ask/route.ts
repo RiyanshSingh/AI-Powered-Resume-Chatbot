@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     // Use gemini-2.5-flash which is the current stable model
     const chatModel = process.env.GEMINI_CHAT_MODEL || "gemini-2.5-flash";
 
-    // 1) Try to load or build embeddings
+    // 1) Build or load embeddings (per-request, never shared across users)
     let hits: Array<{
       id: string;
       source: string;
@@ -58,26 +58,26 @@ export async function POST(req: NextRequest) {
     try {
       let index;
       
-      // First try to load existing embeddings
-      try {
-        index = loadEmbeddingIndex();
-        console.log(`Loaded embedding index with ${index.length} chunks`);
-      } catch (loadError) {
-        // If no embeddings found and files are provided, build them on-the-fly
-        // This is important for serverless environments where embeddings don't persist
-        if (files && files.length > 0) {
-          console.log("No embeddings found, building from provided files...");
-          try {
-            index = await buildEmbeddingIndexFromFiles(files);
-            console.log(`Built embedding index with ${index.length} chunks`);
-          } catch (buildError) {
-            const buildErrorMsg = buildError instanceof Error ? buildError.message : String(buildError);
-            console.error("Failed to build embeddings from files:", buildErrorMsg);
-            // Continue without embeddings
-            throw loadError; // Use original error to proceed without context
-          }
-        } else {
-          // No files provided and no embeddings available
+      // Priority 1: If files are provided, always build embeddings from them (user-specific)
+      // This ensures each user gets their own embeddings, not shared state
+      if (files && files.length > 0) {
+        console.log(`Building embeddings from ${files.length} user-uploaded file(s)...`);
+        try {
+          index = await buildEmbeddingIndexFromFiles(files);
+          console.log(`Built ${index.length} embeddings from user files`);
+        } catch (buildError) {
+          const buildErrorMsg = buildError instanceof Error ? buildError.message : String(buildError);
+          console.error("Failed to build embeddings from files:", buildErrorMsg);
+          // Continue without embeddings
+          throw buildError;
+        }
+      } else {
+        // Priority 2: Load pre-built embeddings (shared, from data/ directory)
+        try {
+          index = loadEmbeddingIndex();
+          console.log(`Loaded ${index.length} pre-built embeddings`);
+        } catch (loadError) {
+          // No files provided and no pre-built embeddings available
           throw loadError;
         }
       }

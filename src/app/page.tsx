@@ -317,18 +317,30 @@ Ask me anything about their background, experience, or what specific skills they
 
   return (
     <div className="min-h-screen bg-black">
-      <main className="mx-auto max-w-full px-4 py-6 space-y-6">
+      <main className="mx-auto max-w-full px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
+        {/* Header with Logo */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
+          {/* Mobile: Logo centered with text below */}
+          <div className="flex flex-col items-center justify-center lg:hidden mb-3">
+            <div className="p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl mb-3">
+              <Brain className="w-8 h-8 text-cyan-400" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-white via-cyan-200 to-purple-200 bg-clip-text text-transparent">
+              AI Powered Resume Chatbot
+            </h1>
+          </div>
+          
+          {/* Desktop: Logo + Text side by side */}
+          <div className="hidden lg:flex items-center justify-center gap-3 mb-4">
             <div className="p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl">
               <Brain className="w-8 h-8 text-cyan-400" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-white via-cyan-200 to-purple-200 bg-clip-text text-transparent">
+            <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-cyan-200 to-purple-200 bg-clip-text text-transparent">
               AI Powered Resume Chatbot
             </h1>
           </div>
@@ -337,20 +349,20 @@ Ask me anything about their background, experience, or what specific skills they
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center mb-2"
+              className="text-center mb-2 px-2"
             >
-              <p className="text-gray-300 text-lg">
+              <p className="text-gray-300 text-sm sm:text-base lg:text-lg">
                 Currently analyzing:{" "}
                 <span className="text-cyan-300 font-semibold">
                   {candidateName}
                 </span>
               </p>
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-400 text-xs sm:text-sm mt-1">
                 Ask intelligent questions about their experience and skills
               </p>
             </motion.div>
           ) : (
-            <p className="text-gray-300 text-lg">
+            <p className="text-gray-300 text-sm sm:text-base lg:text-lg px-2">
               Upload candidate files and unlock AI-powered insights with
               intelligent questioning
             </p>
@@ -358,19 +370,19 @@ Ask me anything about their background, experience, or what specific skills they
         </motion.div>
 
         {/* Two Column Layout */}
-        <div className="grid lg:grid-cols-[2fr_3fr] gap-4 min-h-[75vh]">
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-4 sm:gap-6 min-h-[60vh] sm:min-h-[75vh]">
           {/* Left Column - File Upload Section */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="scrollbar-hide bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-xl overflow-auto h-[75vh] flex flex-col box-border"
+            className="scrollbar-hide bg-white/10 backdrop-blur-md border border-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xl overflow-auto h-[50vh] sm:h-[60vh] lg:h-[75vh] flex flex-col box-border"
           >
-            <h2 className="text-xl font-semibold mb-6 flex items-center gap-3 text-white">
-              <div className="p-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg">
-                <DocumentPlusIcon className="w-5 h-5 text-white" />
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3 text-white">
+              <div className="p-1.5 sm:p-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg">
+                <DocumentPlusIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              Upload Resume and Project Files
+              <span className="text-base sm:text-lg lg:text-xl">Upload Files</span>
             </h2>
 
             <input
@@ -382,20 +394,20 @@ Ask me anything about their background, experience, or what specific skills they
               className="hidden"
             />
 
-            <div className="flex flex-col space-y-6">
+            <div className="flex flex-col space-y-4 sm:space-y-6">
               <motion.button
                 onClick={() => fileInputRef.current?.click()}
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full group border-2 border-dashed border-white/30 rounded-xl p-6 text-center hover:border-cyan-400/50 transition-all duration-300 bg-white/5 backdrop-blur-sm"
+                className="w-full group border-2 border-dashed border-white/30 rounded-lg sm:rounded-xl p-4 sm:p-6 text-center hover:border-cyan-400/50 transition-all duration-300 bg-white/5 backdrop-blur-sm"
               >
                 <motion.div
                   animate={{ rotate: uploadedFiles.length > 0 ? 360 : 0 }}
                   transition={{ duration: 0.6, ease: "easeInOut" }}
                 >
-                  <DocumentPlusIcon className="w-10 h-10 mx-auto mb-3 text-cyan-300 group-hover:text-cyan-200 transition-colors" />
+                  <DocumentPlusIcon className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 sm:mb-3 text-cyan-300 group-hover:text-cyan-200 transition-colors" />
                 </motion.div>
-                <p className="text-sm text-gray-300 group-hover:text-white transition-colors mb-2">
+                <p className="text-xs sm:text-sm text-gray-300 group-hover:text-white transition-colors mb-1 sm:mb-2">
                   Click to upload resume and project files
                 </p>
                 <p className="text-xs text-gray-400">
@@ -403,9 +415,9 @@ Ask me anything about their background, experience, or what specific skills they
                 </p>
               </motion.button>
 
-              <div className="flex-1 space-y-4 min-h-0">
-                <p className="text-base font-medium text-white flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-cyan-400" />
+              <div className="flex-1 space-y-3 sm:space-y-4 min-h-0">
+                <p className="text-sm sm:text-base font-medium text-white flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
                   Uploaded Files
                 </p>
                 {uploadedFiles.length === 0 ? (
@@ -413,7 +425,7 @@ Ask me anything about their background, experience, or what specific skills they
                     No files uploaded yet
                   </p>
                 ) : (
-                  <div className="space-y-3 overflow-auto flex-1 min-h-0 custom-scrollbar">
+                  <div className="space-y-2 sm:space-y-3 overflow-auto flex-1 min-h-0 custom-scrollbar">
                     <AnimatePresence>
                       {uploadedFiles.map((file, i) => (
                         <motion.div
@@ -422,10 +434,10 @@ Ask me anything about their background, experience, or what specific skills they
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, x: -20 }}
                           transition={{ duration: 0.3, delay: i * 0.1 }}
-                          className="flex items-center gap-3 text-sm bg-white/10 rounded-lg p-4 backdrop-blur-sm border border-white/10"
+                          className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm bg-white/10 rounded-lg p-3 sm:p-4 backdrop-blur-sm border border-white/10"
                         >
                           <span
-                            className={`px-3 py-2 rounded-full text-xs font-medium ${
+                            className={`px-2 sm:px-3 py-1 sm:py-2 rounded-full text-[10px] sm:text-xs font-medium flex-shrink-0 ${
                               file.type === "resume"
                                 ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white"
                                 : "bg-gradient-to-r from-green-500 to-emerald-500 text-white"
@@ -433,7 +445,7 @@ Ask me anything about their background, experience, or what specific skills they
                           >
                             {file.type}
                           </span>
-                          <span className="text-gray-200 flex-1 font-medium">
+                          <span className="text-gray-200 flex-1 font-medium truncate">
                             {file.name}
                           </span>
                           <motion.div
@@ -443,7 +455,7 @@ Ask me anything about their background, experience, or what specific skills they
                               repeat: Infinity,
                               ease: "linear",
                             }}
-                            className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full"
+                            className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full flex-shrink-0"
                           />
                         </motion.div>
                       ))}
@@ -456,12 +468,14 @@ Ask me anything about their background, experience, or what specific skills they
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
-                      className="flex items-center gap-2 text-sm text-emerald-400 font-medium bg-emerald-500/10 rounded-lg p-3 border border-emerald-500/20"
+                      className="flex items-center gap-2 text-xs sm:text-sm text-emerald-400 font-medium bg-emerald-500/10 rounded-lg p-2 sm:p-3 border border-emerald-500/20"
                     >
-                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                      {hasIntroduced
-                        ? "Intelligence Ready - Ask Away!"
-                        : "Preparing introduction..."}
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse flex-shrink-0" />
+                      <span className="truncate">
+                        {hasIntroduced
+                          ? "Intelligence Ready - Ask Away!"
+                          : "Preparing introduction..."}
+                      </span>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -474,11 +488,11 @@ Ask me anything about their background, experience, or what specific skills they
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden shadow-xl h-[75vh] flex flex-col"
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl sm:rounded-2xl overflow-hidden shadow-xl h-[50vh] sm:h-[60vh] lg:h-[75vh] flex flex-col"
           >
             <div
               ref={areaRef}
-              className="flex-1 overflow-auto p-6 space-y-4 bg-black custom-scrollbar"
+              className="flex-1 overflow-auto p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4 bg-black custom-scrollbar"
             >
               {messages.length === 0 && (
                 <motion.div
@@ -497,7 +511,7 @@ Ask me anything about their background, experience, or what specific skills they
                     Upload files and discover insights through AI-powered
                     questioning
                   </p>
-                  <div className="mt-6 flex flex-wrap justify-center gap-2">
+                  <div className="mt-4 sm:mt-6 flex flex-wrap justify-center gap-1.5 sm:gap-2 px-2">
                     {[
                       "What technologies does this person use?",
                       "Tell me about their recent achievements",
@@ -509,7 +523,7 @@ Ask me anything about their background, experience, or what specific skills they
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 + i * 0.1 }}
                         onClick={() => setQ(suggestion)}
-                        className="text-xs bg-white/10 text-gray-300 px-3 py-2 rounded-full hover:bg-white/20 transition-all duration-200 backdrop-blur-sm border border-white/10"
+                        className="text-[10px] sm:text-xs bg-white/10 text-gray-300 px-2 sm:px-3 py-1.5 sm:py-2 rounded-full hover:bg-white/20 transition-all duration-200 backdrop-blur-sm border border-white/10"
                       >
                         {suggestion}
                       </motion.button>
@@ -526,30 +540,30 @@ Ask me anything about their background, experience, or what specific skills they
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.4, delay: i * 0.1 }}
-                    className={`flex gap-3 ${
+                    className={`flex gap-2 sm:gap-3 ${
                       m.role === "user" ? "justify-end" : "justify-start"
                     }`}
                   >
                     {/* Avatar for AI */}
                     {m.role === "assistant" && (
-                      <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                        <Brain className="w-5 h-5 text-white" />
+                      <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                        <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                       </div>
                     )}
 
                     <div
-                      className={`max-w-[75%] ${
+                      className={`max-w-[85%] sm:max-w-[75%] ${
                         m.role === "user" ? "order-2" : ""
                       }`}
                     >
                       <div
-                        className={`p-4 rounded-2xl shadow-lg ${
+                        className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg ${
                           m.role === "user"
                             ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white ml-auto"
                             : "bg-white/90 backdrop-blur-md text-gray-800 border border-white/20"
                         }`}
                       >
-                        <div className="prose prose-sm max-w-none">
+                        <div className="prose prose-sm sm:prose-base max-w-none text-xs sm:text-sm">
                           <ReactMarkdown>{m.text}</ReactMarkdown>
                         </div>
 
@@ -566,7 +580,7 @@ Ask me anything about their background, experience, or what specific skills they
                                   initial={{ opacity: 0, scale: 0.8 }}
                                   animate={{ opacity: 1, scale: 1 }}
                                   transition={{ delay: idx * 0.1 }}
-                                  className="px-2 py-1 text-xs rounded-lg bg-gray-800 hover:bg-gray-700 text-white transition-colors"
+                                  className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs rounded-md sm:rounded-lg bg-gray-800 hover:bg-gray-700 text-white transition-colors"
                                 >
                                   {source}
                                 </motion.button>
@@ -598,8 +612,8 @@ Ask me anything about their background, experience, or what specific skills they
 
                     {/* Avatar for User */}
                     {m.role === "user" && (
-                      <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
-                        <User className="w-5 h-5 text-white" />
+                      <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                        <User className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                       </div>
                     )}
                   </motion.div>
@@ -614,16 +628,16 @@ Ask me anything about their background, experience, or what specific skills they
                     exit={{ opacity: 0, y: -20 }}
                     className="flex justify-start gap-3"
                   >
-                    <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                      <Brain className="w-5 h-5 text-white" />
+                    <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                      <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     </div>
-                    <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 text-gray-700 border border-white/20 shadow-lg">
-                      <div className="flex items-center gap-3">
+                    <div className="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl p-3 sm:p-4 text-gray-700 border border-white/20 shadow-lg">
+                      <div className="flex items-center gap-2 sm:gap-3">
                         <div className="flex gap-1">
                           {[0, 1, 2].map((i) => (
                             <motion.div
                               key={i}
-                              className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"
+                              className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"
                               animate={{
                                 scale: [1, 1.2, 1],
                                 opacity: [0.7, 1, 0.7],
@@ -637,7 +651,7 @@ Ask me anything about their background, experience, or what specific skills they
                             />
                           ))}
                         </div>
-                        <span className="text-sm font-medium">
+                        <span className="text-xs sm:text-sm font-medium">
                           AI is thinking...
                         </span>
                       </div>
@@ -648,15 +662,15 @@ Ask me anything about their background, experience, or what specific skills they
             </div>
 
             {/* Input Form */}
-            <div className="border-t border-white/10 bg-black/20 backdrop-blur-md p-6">
-              <form onSubmit={ask} className="flex gap-3">
+            <div className="border-t border-white/10 bg-black/20 backdrop-blur-md p-3 sm:p-4 lg:p-6">
+              <form onSubmit={ask} className="flex gap-2 sm:gap-3">
                 <motion.button
                   type="button"
                   onClick={startListening}
                   disabled={isListening || loading}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className={`p-3 rounded-xl transition-all duration-200 ${
+                  className={`p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all duration-200 flex-shrink-0 ${
                     isListening
                       ? "bg-gradient-to-r from-red-500 to-pink-500 shadow-lg shadow-red-500/25"
                       : "bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20"
@@ -667,7 +681,7 @@ Ask me anything about their background, experience, or what specific skills they
                     transition={{ duration: 0.6, repeat: Infinity }}
                   >
                     <MicrophoneIcon
-                      className={`w-5 h-5 ${
+                      className={`w-4 h-4 sm:w-5 sm:h-5 ${
                         isListening ? "text-white" : "text-gray-300"
                       }`}
                     />
@@ -676,8 +690,8 @@ Ask me anything about their background, experience, or what specific skills they
 
                 <div className="flex-1 relative">
                   <input
-                    className="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3 text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-200"
-                    placeholder="Ask intelligent questions about experience, skills, projects..."
+                    className="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg sm:rounded-xl px-3 sm:px-6 py-2 sm:py-3 text-white placeholder-gray-400 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-200 text-sm sm:text-base"
+                    placeholder="Ask AI about candidate..."
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
                     disabled={loading}
@@ -702,11 +716,12 @@ Ask me anything about their background, experience, or what specific skills they
                   }
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-xl hover:from-cyan-400 hover:to-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg shadow-cyan-500/25"
+                  className="px-4 sm:px-6 lg:px-8 py-2 sm:py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg sm:rounded-xl hover:from-cyan-400 hover:to-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg shadow-cyan-500/25 text-xs sm:text-sm lg:text-base flex-shrink-0"
                 >
-                  <span className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4" />
-                    Ask AI
+                  <span className="flex items-center gap-1 sm:gap-2">
+                    <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">Ask AI</span>
+                    <span className="sm:hidden">AI</span>
                   </span>
                 </motion.button>
               </form>
@@ -715,13 +730,14 @@ Ask me anything about their background, experience, or what specific skills they
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="text-xs text-gray-400 mt-3 flex items-center gap-2"
+                className="text-[10px] sm:text-xs text-gray-400 mt-2 sm:mt-3 flex items-center gap-1 sm:gap-2 flex-wrap"
               >
-                <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse" />
-                Powered by AI intelligence • Answers sourced from uploaded
-                files
-                {uploadedFiles.length === 0 &&
-                  " • Upload files to unlock insights"}
+                <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse flex-shrink-0" />
+                <span className="hidden sm:inline">Powered by AI intelligence • Answers sourced from uploaded files</span>
+                <span className="sm:hidden">AI powered</span>
+                {uploadedFiles.length === 0 && (
+                  <span className="hidden sm:inline"> • Upload files to unlock insights</span>
+                )}
               </motion.div>
             </div>
           </motion.div>
@@ -729,12 +745,12 @@ Ask me anything about their background, experience, or what specific skills they
       </main>
       
       {/* Footer */}
-      <footer className="mt-8 py-6 text-center">
+      <footer className="mt-4 sm:mt-8 py-4 sm:py-6 text-center px-4">
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="text-sm text-gray-400"
+          className="text-xs sm:text-sm text-gray-400"
         >
           Made in india with ❤️ by Riyansh
         </motion.p>

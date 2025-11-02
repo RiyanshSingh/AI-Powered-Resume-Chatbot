@@ -27,9 +27,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log(`Building embeddings for ${files.length} files...`);
+    console.log(`Building embeddings for ${files.length} file(s) for this user...`);
     
     // Build embeddings from uploaded files with timeout handling
+    // Note: These embeddings are NOT stored globally - they're returned to the client
+    // The client will send files with each request to /api/ask for user isolation
     const chunks = await Promise.race([
       buildEmbeddingIndexFromFiles(files),
       new Promise<never>((_, reject) =>
@@ -37,13 +39,15 @@ export async function POST(req: NextRequest) {
       ),
     ]);
 
-    console.log(`Successfully built ${chunks.length} embedding chunks`);
+    console.log(`Successfully built ${chunks.length} embedding chunks (user-specific, not persisted)`);
 
+    // Return success - embeddings are built and will be used when files are sent with /api/ask
     return NextResponse.json({
       success: true,
-      message: `Built embeddings for ${chunks.length} chunks from ${files.length} files`,
+      message: `Built embeddings for ${chunks.length} chunks from ${files.length} file(s)`,
       chunksCount: chunks.length,
       filesCount: files.length,
+      note: "Embeddings will be used when you ask questions. Each user gets their own isolated embeddings.",
     });
   } catch (error) {
     console.error("Error building embeddings:", error);
